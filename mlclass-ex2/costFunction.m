@@ -3,11 +3,11 @@ function [J, grad] = costFunction(theta, X, y)
 %   parameter for logistic regression and the gradient of the cost
 
     % Initialize some useful values
-    m = length(y); %#ok<NASGU> % number of training examples
+    m = length(y);  % number of training examples
 
     % You need to return the following variables correctly
-    J = 0; %#ok<NASGU>
-    grad = zeros(size(theta)); %#ok<NASGU>
+    J = 0;
+    grad = zeros(size(theta));
 
     % Instructions: Compute the cost of a particular choice of theta.
     %               You should set J to the cost.
@@ -20,8 +20,6 @@ function [J, grad] = costFunction(theta, X, y)
     
     J = mean((-y .* log(sig)) - ((1 - y) .* log(1 - sig))); % cost function logistic regression
     
-    % sig_y = sig - y;                      % For Octave
-    sig_y = repmat((sig - y),1,size(X,2));  % For Matlab
-    grad = mean(sig_y .* X);    % gradient
+    grad = (X' * (sig - y)) / m;    % gradient
 
 end

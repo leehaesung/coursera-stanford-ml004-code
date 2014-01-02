@@ -25,8 +25,6 @@ function [J, grad] = costFunctionReg(theta, X, y, lambda)
     
     J = mean((-y .* log(sig)) - ((1 - y) .* log(1 - sig))) + reg_term;
     
-    % sig_y = sig - y;                      % For Octave
-    sig_y = repmat((sig - y),1,size(X,2));  % For Matlab
-    grad = mean(sig_y .* X) + (theta .* (lambda / m))';    % gradient
+    grad = ((X' * sig) ./ m) + (theta .* (lambda / m));    % gradient
 
 end
