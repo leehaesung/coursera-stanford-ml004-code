@@ -10,5 +10,6 @@ function J = computeCostMulti(X, y, theta)
     J = 0; %#ok<*NASGU>
 
     J = (X * theta - y)' * (X * theta - y) / (2 * m);
+%    J2 = sum ((X * theta - y) .^2) / (2 * m);
 
 end

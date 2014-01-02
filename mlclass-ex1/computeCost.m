@@ -8,5 +8,6 @@ function J = computeCost(X, y, theta)
 
     J = sum ((X * theta - y) .^2) / (2 * m);    % Cost Function
     % or J = mean((X * theta - y) .^2) / 2
+    % or J = (X * theta - y)' * (X * theta - y) / (2 * m);
 
 end
