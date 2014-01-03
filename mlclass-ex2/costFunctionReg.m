@@ -21,10 +21,10 @@ function [J, grad] = costFunctionReg(theta, X, y, lambda)
     %theta_reg(1) = 0;
     
     sig = sigmoid(X * theta);   % hypothesis logistic regression
-    reg_term = sum(theta .^ 2) * lambda / (2 * m);
+    reg_term = sum(theta(2:end) .^ 2) * lambda / (2 * m);
     
     J = mean((-y .* log(sig)) - ((1 - y) .* log(1 - sig))) + reg_term;
     
-    grad = ((X' * sig) ./ m) + (theta .* (lambda / m));    % gradient
+    grad = ((X' * (sig - y)) ./ m) + (theta .* (lambda / m));    % gradient
 
 end
