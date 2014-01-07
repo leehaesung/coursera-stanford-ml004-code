@@ -14,21 +14,21 @@ function [J grad] = nnCostFunction(nn_params, ...
 %   partial derivatives of the neural network.
 %
 
-% Reshape nn_params back into the parameters Theta1 and Theta2, the weight matrices
-% for our 2 layer neural network
-Theta1 = reshape(nn_params(1:hidden_layer_size * (input_layer_size + 1)), ...
+    % Reshape nn_params back into the parameters Theta1 and Theta2, the weight matrices
+    % for our 2 layer neural network
+    Theta1 = reshape(nn_params(1:hidden_layer_size * (input_layer_size + 1)), ...
                  hidden_layer_size, (input_layer_size + 1));
 
-Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):end), ...
+    Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):end), ...
                  num_labels, (hidden_layer_size + 1));
 
-% Setup some useful variables
-m = size(X, 1);
+    % Setup some useful variables
+    m = size(X, 1);
          
-% You need to return the following variables correctly 
-J = 0;
-Theta1_grad = zeros(size(Theta1));
-Theta2_grad = zeros(size(Theta2));
+    % You need to return the following variables correctly 
+    J = 0;
+    Theta1_grad = zeros(size(Theta1));
+    Theta2_grad = zeros(size(Theta2));
 
 % ====================== YOUR CODE HERE ======================
 % Instructions: You should complete the code by working through the
@@ -62,30 +62,76 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+    % Feedforward
+    % compute hidden layer
+    X = [ones(m,1) X];
+    A = [ones(m,1) sigmoid(X * Theta1')];
+    h = sigmoid(A * Theta2');
 
+    %reg_term = sum(theta(2:end) .^ 2) * lambda / (2 * m);
+    
+    class_one_minus_y = ones(m,num_labels);
+    class_y = zeros(m,num_labels);
+    
+    for item = 1:m
+       class_one_minus_y(item,y(item)) = 0;
+       class_y(item, y(item)) = 1;
+    end
+    
+    % Cost Function Unregularizated
+    J_unreg = mean(sum( - log(h) .* class_y - log(1 - h) .* class_one_minus_y, 2));
+    
+    % Regular Term
+    reg_term = (sum(sum(Theta1(:,2:end) .^2)) + sum(sum(Theta2(:,2:end) .^2))) * lambda / (2 * m);
+    
+    % Cost Function Unregularizated
+    J = J_unreg + reg_term;
 
+    %{
+    delta3 = h - class_y;
+    temp = delta3 * Theta2;
+    
+    for i = 1:m
+        a1 = X(i,:)';
+        z2 = Theta1 * a1;
+        a2 = sigmoid(z2);
+        a2 = [1; a2];
+        delta2 = temp(i,2:end)' .* sigmoidGradient(z2);
 
+        Theta1_grad = Theta1_grad + delta2 * a1';
+        Theta2_grad = Theta2_grad + delta3(i,:) * a2';
+    end
+    %}
+    
+    % Gradient
+    for i = 1:m
+        a1 = X(i,:)';
+        z2 = Theta1 * a1;
+        a2 = sigmoid(z2);
+        a2 = [1; a2];
+        z3 = Theta2 * a2;
+        a3 = sigmoid(z3);
+    
+        yi = zeros(num_labels, 1);
+        yi(y(i)) = 1;
+        delta3 = a3 - yi;
+        
+        temp = Theta2' * delta3;
+        delta2 = temp(2:end) .* sigmoidGradient(z2);
 
+        Theta1_grad = Theta1_grad + delta2 * a1';
+        Theta2_grad = Theta2_grad + delta3 * a2';
+    end
 
+    % Gradient
+    Theta1_grad = Theta1_grad / m;
+    Theta2_grad = Theta2_grad / m;
 
-
-
-
-
-
-
-
-
-
-
-
-
-% -------------------------------------------------------------
-
-% =========================================================================
-
-% Unroll gradients
-grad = [Theta1_grad(:) ; Theta2_grad(:)];
-
+    % Gradient Regularized
+    Theta1_grad(:,2:end) = Theta1_grad(:,2:end) + lambda * Theta1(:,2:end) / m;
+    Theta2_grad(:,2:end) = Theta2_grad(:,2:end) + lambda * Theta2(:,2:end) / m;
+    
+    % Unroll gradients
+    grad = [Theta1_grad(:) ; Theta2_grad(:)];
 
 end
